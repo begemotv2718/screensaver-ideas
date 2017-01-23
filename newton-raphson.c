@@ -2,12 +2,21 @@
 #include <math.h>
 #include <complex.h>
 
-#define NPOINTS 3
+#define NPOINTS 8
 
 int picture[1024*1024];
+
+complex double mypow(complex double z, int pow){
+  int i;
+  complex double res=1.0;
+  for(i=0;i<pow;i++)
+    res=res*z;
+  return res;
+}
+
 complex double iterate(complex double z){
   complex double res_z;
-  res_z=z-(z*z*z-1.0)/(2*z*z);
+  res_z=z-(mypow(z,NPOINTS)-1.0)/(NPOINTS*mypow(z,NPOINTS-1));
   return res_z;
 }
 
@@ -109,9 +118,9 @@ for (y = height - 1; y >= 0; y--)     // BMP image format is written from bottom
    for (x = 0; x <= width - 1; x++)
    {
 
-      red = picture[x+width*y]*5;
-      green = picture[x+width*y]*5;
-      blue = picture[x+width*y]*5;
+      red = picture[x+width*y]*3;
+      green = picture[x+width*y]*3;
+      blue = picture[x+width*y]*3;
 
       if (red > 255) red = 255; if (red < 0) red = 0;
       if (green > 255) green = 255; if (green < 0) green = 0;
@@ -137,7 +146,7 @@ return;
 }
 
 
-
+#define PI 3.14159265358979
 
 int main(void){
     complex double z;
@@ -145,12 +154,19 @@ int main(void){
     complex double roots[NPOINTS];
     double step=2.0/1024.0;
     int niterations;
-
+    
+    for(int n=0;n<NPOINTS;n++){
+      roots[n]=cos(2*PI*n/(double)NPOINTS)+I*sin(2*PI*n/(double)NPOINTS);
+    }
+    /*   
+    printf("%f %f \n",creal(roots[0]-1.0),cimag(roots[0]-1.0)); 
     roots[0]=1.0+0.0*I;
+    printf("%f %f \n",creal(roots[1]+0.5-I*sqrt(3)/2.0)*1e6,cimag(roots[1]+0.5-I*sqrt(3)/2.0)*1e6); 
     roots[1]=-0.5+I*sqrt(3)/2.0;
+    printf("%f %f \n",creal(roots[2]+0.5+I*sqrt(3)/2.0)*1e6,cimag(roots[2]+0.5+I*sqrt(3)/2.0)*1e6); 
     roots[2]=-0.5-I*sqrt(3)/2.0;
-
-
+    */
+  
     for(y=0;y<1024;y++){
       for(x=0;x<1024;x++){
         z=(x*step-1.0)+(y*step-1.0)*I;
